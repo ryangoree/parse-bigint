@@ -1,0 +1,8 @@
+dist
+*.local
+node_modules
+.DS_Store
+*.pem
+yarn-debug.log*
+yarn-error.log*
+.env
