@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout project repository
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      # Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          registry-url: https://registry.npmjs.org/
+          node-version: 20
+          cache: 'yarn'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      # Make sure the package builds
+      - name: Build
+        run: yarn build
+
+      # Upload the build to artifacts for inspection/troubleshooting
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      # Publish version to public repository
+      - name: Publish
+        run: yarn publish --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
