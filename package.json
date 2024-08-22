@@ -20,6 +20,11 @@
   "files": [
     "dist"
   ],
+  "author": "ryan goree (https://github.com/ryangoree)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ryangoree/parse-bigint"
+  },
   "publishConfig": {
     "access": "public"
   }
