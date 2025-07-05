@@ -3,11 +3,23 @@
   "include": ["src"],
   "exclude": ["node_modules", "**/*.test.ts"],
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "module": "esnext",
-    "moduleResolution": "Bundler",
+    // Environment
+    "module": "nodenext",
+    "moduleDetection": "force",
+    "moduleResolution": "nodenext",
+
+    // Type Checking
+    "strict": true,
+    "skipLibCheck": true,
+    "noUncheckedIndexedAccess": true,
+
+    // Output
     "target": "esnext",
-    "declaration": true
+    "rootDir": "src",
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "esModuleInterop": true
   }
 }

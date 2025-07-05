@@ -1,7 +1,7 @@
 # parse-bigint
 
 A single function, `parseBigInt`, that takes a number-like value and returns a
-BigInt with support for scientific notation, underscores, commas, and base
+`BigInt` with support for scientific notation, underscores, commas, and base
 prefixes.
 
 ## Installation

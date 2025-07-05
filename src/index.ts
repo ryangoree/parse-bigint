@@ -15,39 +15,40 @@
  * ```
  */
 export function parseBigInt(x: bigint | number | string): bigint {
-  switch (typeof x) {
-    case 'bigint':
-      return x;
+	switch (typeof x) {
+		case 'bigint':
+			return x;
 
-    case 'number':
-      return BigInt(x);
+		case 'number':
+			return BigInt(x);
 
-    case 'string':
-      x = x.trim().toLowerCase().replace(/(_|,)/g, '');
-      let sign = 1n;
-      if (x.startsWith('-')) {
-        sign = -1n;
-        x = x.slice(1);
-      }
-      if (x.startsWith('+')) {
-        x = x.slice(1);
-      }
-      if (x.startsWith('0x') || x.startsWith('0b') || x.startsWith('0o')) {
-        return BigInt(x) * sign;
-      }
-      if (x.includes('e')) {
-        let [mantissaStr, exponentStr] = x.split('e');
-        const exponent = BigInt(exponentStr);
-        const [_, fractionStr] = mantissaStr.split('.');
-        let scaleFactor = exponent - BigInt(fractionStr?.length || 0);
-        if (scaleFactor < 0) {
-          throw new Error(
-            `Invalid BigInt: Decimal precision (.${fractionStr}) exceeds exponent (${exponent}): ${x}`
-          );
-        }
+		case 'string': {
+			x = x.trim().toLowerCase().replace(/(_|,)/g, '');
+			let sign = 1n;
+			if (x.startsWith('-')) {
+				sign = -1n;
+				x = x.slice(1);
+			}
+			if (x.startsWith('+')) {
+				x = x.slice(1);
+			}
+			if (x.startsWith('0x') || x.startsWith('0b') || x.startsWith('0o')) {
+				return BigInt(x) * sign;
+			}
+			if (x.includes('e')) {
+				const [mantissaStr, exponentStr] = x.split('e');
+				const exponent = BigInt(exponentStr);
+				const [_, fractionStr] = mantissaStr.split('.');
+				const scaleFactor = exponent - BigInt(fractionStr?.length || 0);
+				if (scaleFactor < 0) {
+					throw new Error(
+						`Invalid BigInt: Decimal precision (.${fractionStr}) exceeds exponent (${exponent}): ${x}`,
+					);
+				}
 
-        return BigInt(mantissaStr.replace('.', '')) * 10n ** scaleFactor * sign;
-      }
-      return BigInt(x) * sign;
-  }
+				return BigInt(mantissaStr.replace('.', '')) * 10n ** scaleFactor * sign;
+			}
+			return BigInt(x) * sign;
+		}
+	}
 }
