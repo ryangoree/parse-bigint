@@ -14,41 +14,76 @@
  * parseBigInt('0o10'); // 8n
  * ```
  */
-export function parseBigInt(x: bigint | number | string): bigint {
-	switch (typeof x) {
+export function parseBigInt(input: bigint | number | string): bigint {
+	switch (typeof input) {
 		case 'bigint':
-			return x;
+			return input;
 
 		case 'number':
-			return BigInt(x);
+			return BigInt(input);
 
 		case 'string': {
-			x = x.trim().toLowerCase().replace(/(_|,)/g, '');
+			let n = input.trim().toLowerCase().replace(/(_|,)/g, '');
+
 			let sign = 1n;
-			if (x.startsWith('-')) {
+			if (n.startsWith('-')) {
 				sign = -1n;
-				x = x.slice(1);
+				n = n.slice(1);
 			}
-			if (x.startsWith('+')) {
-				x = x.slice(1);
+			if (n.startsWith('+')) {
+				n = n.slice(1);
 			}
-			if (x.startsWith('0x') || x.startsWith('0b') || x.startsWith('0o')) {
-				return BigInt(x) * sign;
-			}
-			if (x.includes('e')) {
-				const [mantissaStr, exponentStr] = x.split('e');
-				const exponent = BigInt(exponentStr);
-				const [_, fractionStr] = mantissaStr.split('.');
-				const scaleFactor = exponent - BigInt(fractionStr?.length || 0);
-				if (scaleFactor < 0) {
+
+			// Handle scientific notation.
+			if (n.includes('e') && !n.startsWith('0x')) {
+				const [mantissaStr = '', exponentStr = '', invalidExponent] =
+					n.split('e');
+
+				// Validate input format.
+				if (invalidExponent || !/^-?\d*$/.test(exponentStr)) {
 					throw new Error(
-						`Invalid BigInt: Decimal precision (.${fractionStr}) exceeds exponent (${exponent}): ${x}`,
+						`Invalid exponent in ${input}: ${n.replace(/^[^e]+e/, '')}`,
 					);
 				}
+				if (!/^\d+(\.\d+)?$/.test(mantissaStr)) {
+					throw new Error(`Invalid number format: ${input}`);
+				}
 
-				return BigInt(mantissaStr.replace('.', '')) * 10n ** scaleFactor * sign;
+				// To handle cases like "12300e-2", the trailing zeroes are separated
+				// from the integer version of the significand and used to adjust the
+				// exponent since BigInt doesn't support negative exponents.
+				const [integerSignificandStr = '', trailingZeroesStr = ''] = mantissaStr
+					.replace('.', '')
+					.split(/(?<=[1-9]+)(?=0+$)/);
+
+				// Adjust the exponent to account for the decimal point's position and
+				// any trailing zeroes that were part of the original mantissa.
+				const [_, fractionStr = ''] = mantissaStr.split('.');
+				const adjustedExponent =
+					BigInt(exponentStr) -
+					BigInt(fractionStr.length) +
+					BigInt(trailingZeroesStr.length);
+
+				// A negative adjusted exponent implies a non-integer.
+				if (adjustedExponent < 0) {
+					const exponentNumber = Number(adjustedExponent);
+					const unscaledStr = integerSignificandStr.padStart(
+						Math.abs(exponentNumber) + 1,
+						'0',
+					);
+					const integerStr = unscaledStr.slice(0, exponentNumber);
+					const fractionStr = unscaledStr.slice(exponentNumber);
+					throw new Error(`Invalid BigInt: ${integerStr}.${fractionStr}`);
+				}
+
+				return BigInt(integerSignificandStr) * 10n ** adjustedExponent * sign;
 			}
-			return BigInt(x) * sign;
+
+			try {
+				return BigInt(n) * sign;
+			} catch {
+				throw new Error(`Invalid number format: ${input}`);
+			}
 		}
 	}
 }
