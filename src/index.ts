@@ -36,47 +36,40 @@ export function parseBigInt(input: bigint | number | string): bigint {
 
       // Handle scientific notation.
       if (n.includes('e') && !n.startsWith('0x')) {
-        const [mantissaStr = '', exponentStr = '', invalidExponent] =
+        let [mantissaStr = '', exponentStr = '', InvalidExponent] =
           n.split('e');
+        const [integerStr, fractionStr = '', invalidFraction] =
+          mantissaStr.split('.');
 
-        // Validate input format.
-        if (invalidExponent || !/^-?\d*$/.test(exponentStr)) {
-          throw new Error(
-            `Invalid exponent in ${input}: ${n.replace(/^[^e]+e/, '')}`,
-          );
-        }
-        if (!/^\d+(\.\d+)?$/.test(mantissaStr)) {
+        if (InvalidExponent || invalidFraction) {
           throw new Error(`Invalid number format: ${input}`);
         }
 
-        // To handle cases like "12300e-2", the trailing zeroes are separated
-        // from the integer version of the significand and used to adjust the
-        // exponent since BigInt doesn't support negative exponents.
-        const [integerSignificandStr = '', trailingZeroesStr = ''] = mantissaStr
-          .replace('.', '')
-          .split(/(?<=[1-9]+)(?=0+$)/);
+        let adjustedExponent = +exponentStr - fractionStr.length;
+        mantissaStr = `${integerStr}${fractionStr}`;
 
-        // Adjust the exponent to account for the decimal point's position and
-        // any trailing zeroes that were part of the original mantissa.
-        const [_, fractionStr = ''] = mantissaStr.split('.');
-        const adjustedExponent =
-          BigInt(exponentStr) -
-          BigInt(fractionStr.length) +
-          BigInt(trailingZeroesStr.length);
+        if (adjustedExponent < 0 && mantissaStr.endsWith('0')) {
+          const indexOfZero = mantissaStr.indexOf('0');
+          adjustedExponent += mantissaStr.slice(indexOfZero).length;
+          mantissaStr = mantissaStr.slice(0, indexOfZero);
+        }
 
         // A negative adjusted exponent implies a non-integer.
         if (adjustedExponent < 0) {
-          const exponentNumber = Number(adjustedExponent);
-          const unscaledStr = integerSignificandStr.padStart(
-            Math.abs(exponentNumber) + 1,
+          const unscaledStr = mantissaStr.padStart(
+            Math.abs(adjustedExponent) + 1,
             '0',
           );
-          const integerStr = unscaledStr.slice(0, exponentNumber);
-          const fractionStr = unscaledStr.slice(exponentNumber);
+          const integerStr = unscaledStr.slice(0, adjustedExponent);
+          const fractionStr = unscaledStr.slice(adjustedExponent);
           throw new Error(`Invalid BigInt: ${integerStr}.${fractionStr}`);
         }
 
-        return BigInt(integerSignificandStr) * 10n ** adjustedExponent * sign;
+        try {
+          return BigInt(mantissaStr) * 10n ** BigInt(adjustedExponent) * sign;
+        } catch {
+          throw new Error(`Invalid number format: ${input}`);
+        }
       }
 
       try {

@@ -11,8 +11,8 @@
     "typescript": "^5.5.4"
   },
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
+    "build": "rm -rf dist && tsc --project tsconfig.build.json",
+    "watch": "npm run build --watch",
     "test": "node --test src/**",
     "test:watch": "node --test --watch src/**",
     "typecheck": "tsc --noEmit"

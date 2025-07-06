@@ -1,12 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "include": ["src"],
-  "exclude": ["node_modules", "**/*.test.ts"],
   "compilerOptions": {
     // Environment
     "module": "nodenext",
     "moduleDetection": "force",
     "moduleResolution": "nodenext",
+    "allowImportingTsExtensions": true,
 
     // Type Checking
     "strict": true,
@@ -14,12 +14,6 @@
     "noUncheckedIndexedAccess": true,
 
     // Output
-    "target": "esnext",
-    "rootDir": "src",
-    "outDir": "dist",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "esModuleInterop": true
+    "noEmit": true
   }
 }
