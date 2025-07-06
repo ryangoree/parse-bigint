@@ -1,6 +1,6 @@
 {
   "name": "parse-bigint",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Parses a number-like value into a BigInt with support for scientific notation, underscores, commas, and base prefixes.",
   "license": "AGPL-3.0",
   "author": "ryan goree (https://github.com/ryangoree)",
