@@ -36,12 +36,12 @@ export function parseBigInt(input: bigint | number | string): bigint {
 
       // Handle scientific notation.
       if (n.includes('e') && !n.startsWith('0x')) {
-        let [mantissaStr = '', exponentStr = '', InvalidExponent] =
+        let [mantissaStr = '', exponentStr = '', invalidExponent] =
           n.split('e');
         const [integerStr, fractionStr = '', invalidFraction] =
           mantissaStr.split('.');
 
-        if (InvalidExponent || invalidFraction) {
+        if (invalidExponent || invalidFraction) {
           throw new Error(`Invalid number format: ${input}`);
         }
 
