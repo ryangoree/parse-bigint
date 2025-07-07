@@ -45,24 +45,20 @@ export function parseBigInt(input: bigint | number | string): bigint {
           throw new Error(`Invalid number format: ${input}`);
         }
 
-        let adjustedExponent = +exponentStr - fractionStr.length;
+        const adjustedExponent = +exponentStr - fractionStr.length;
         mantissaStr = `${integerStr}${fractionStr}`;
 
-        if (adjustedExponent < 0 && mantissaStr.endsWith('0')) {
-          const indexOfZero = mantissaStr.indexOf('0');
-          adjustedExponent += mantissaStr.slice(indexOfZero).length;
-          mantissaStr = mantissaStr.slice(0, indexOfZero);
-        }
-
-        // A negative adjusted exponent implies a non-integer.
         if (adjustedExponent < 0) {
-          const unscaledStr = mantissaStr.padStart(
-            Math.abs(adjustedExponent) + 1,
-            '0',
-          );
-          const integerStr = unscaledStr.slice(0, adjustedExponent);
-          const fractionStr = unscaledStr.slice(adjustedExponent);
-          throw new Error(`Invalid BigInt: ${integerStr}.${fractionStr}`);
+          const fractionStr = mantissaStr.slice(adjustedExponent);
+          if (+fractionStr !== 0) {
+            const integerStr = mantissaStr
+              .padStart(Math.abs(adjustedExponent) + 1, '0')
+              .slice(0, adjustedExponent);
+            throw new Error(
+              `Invalid BigInt: ${integerStr}.${fractionStr.replace(/0+$/, '')}`,
+            );
+          }
+          return BigInt(mantissaStr.slice(0, adjustedExponent)) * sign;
         }
 
         try {
