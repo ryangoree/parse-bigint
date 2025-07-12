@@ -49,11 +49,14 @@ export function parseBigInt(input: bigint | number | string): bigint {
         mantissaStr = `${integerStr}${fractionStr}`;
 
         if (adjustedExponent < 0) {
-          const fractionStr = mantissaStr.slice(adjustedExponent);
-          if (+fractionStr !== 0) {
-            const integerStr = mantissaStr
-              .padStart(Math.abs(adjustedExponent) + 1, '0')
-              .slice(0, adjustedExponent);
+          if (+mantissaStr.slice(adjustedExponent) !== 0) {
+            const unscaledStr = mantissaStr.padStart(
+              Math.abs(adjustedExponent) + 1,
+              '0',
+            );
+            const integerStr = unscaledStr.slice(0, adjustedExponent);
+            const fractionStr = unscaledStr.slice(adjustedExponent);
+            console.log({ adjustedExponent, fractionStr, integerStr });
             throw new Error(
               `Invalid BigInt: ${integerStr}.${fractionStr.replace(/0+$/, '')}`,
             );

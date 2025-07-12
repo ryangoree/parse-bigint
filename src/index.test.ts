@@ -40,7 +40,7 @@ suite('scientific notation', () => {
     assert.throws(() => parseBigInt('1e-1'));
     assert.strictEqual(parseBigInt('10e-1'), 1n);
     assert.strictEqual(parseBigInt('-1000e-2'), -10n);
-    assert.strictEqual(parseBigInt('-10110e-2'), -101n);
+    assert.strictEqual(parseBigInt('-10100e-2'), -101n);
   });
 });
 
