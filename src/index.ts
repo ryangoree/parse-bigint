@@ -56,7 +56,6 @@ export function parseBigInt(input: bigint | number | string): bigint {
             );
             const integerStr = unscaledStr.slice(0, adjustedExponent);
             const fractionStr = unscaledStr.slice(adjustedExponent);
-            console.log({ adjustedExponent, fractionStr, integerStr });
             throw new Error(
               `Invalid BigInt: ${integerStr}.${fractionStr.replace(/0+$/, '')}`,
             );
