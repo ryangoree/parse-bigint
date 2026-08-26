@@ -34,7 +34,7 @@ export function parseBigInt(input: bigint | number | string): bigint {
       }
 
       // Handle scientific notation.
-      if (n.includes('e') && !n.startsWith('0x')) {
+      if (!n.startsWith('0x') && n.includes('e')) {
         let [mantissaStr = '', exponentStr = '', invalidExponent] =
           n.split('e');
         const [integerStr, fractionStr = '', invalidFraction] =
