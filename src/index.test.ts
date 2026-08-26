@@ -4,6 +4,23 @@ import { parseBigInt } from './index.ts';
 it('parses simple integer strings', () => {
   expect(parseBigInt('123')).toStrictEqual(123n);
   expect(parseBigInt('-123')).toStrictEqual(-123n);
+  expect(parseBigInt('+123')).toStrictEqual(123n);
+});
+
+it('parses single unary operators', () => {
+  expect(parseBigInt('-123')).toStrictEqual(-123n);
+  expect(parseBigInt('+123')).toStrictEqual(123n);
+});
+
+it('parses multiple unary operators', () => {
+  expect(parseBigInt('-+123')).toStrictEqual(-123n);
+  expect(parseBigInt('+-123')).toStrictEqual(-123n);
+  expect(parseBigInt('-+-+123')).toStrictEqual(123n);
+  expect(parseBigInt('+-+-123')).toStrictEqual(123n);
+  expect(parseBigInt('-+-+-123')).toStrictEqual(-123n);
+  expect(parseBigInt('+-+-+123')).toStrictEqual(123n);
+  expect(parseBigInt('-+-+-+123')).toStrictEqual(-123n);
+  expect(parseBigInt('+-+-+-123')).toStrictEqual(-123n);
 });
 
 it('ignores underscores', () => {

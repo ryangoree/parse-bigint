@@ -26,11 +26,10 @@ export function parseBigInt(input: bigint | number | string): bigint {
       let n = input.trim().toLowerCase().replace(/(_|,)/g, '');
 
       let sign = 1n;
-      if (n.startsWith('-')) {
-        sign = -1n;
-        n = n.slice(1);
-      }
-      if (n.startsWith('+')) {
+      while (n.startsWith('-') || n.startsWith('+')) {
+        if (n.startsWith('-')) {
+          sign = -sign;
+        }
         n = n.slice(1);
       }
 
