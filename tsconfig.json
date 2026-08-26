@@ -4,6 +4,7 @@
   "compilerOptions": {
     // Environment
     "module": "nodenext",
+    "types": ["bun"],
     "moduleDetection": "force",
     "moduleResolution": "nodenext",
     "allowImportingTsExtensions": true,

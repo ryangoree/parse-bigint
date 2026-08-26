@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./tsconfig.json",
-  "exclude": ["**/*.test.ts", "src/benchmark.ts"],
+  "exclude": ["**/*.test.ts"],
   "compilerOptions": {
     // Environment
     "allowImportingTsExtensions": false,
